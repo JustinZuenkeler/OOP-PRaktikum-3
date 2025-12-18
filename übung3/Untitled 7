@@ -1,0 +1,260 @@
+Aufgabe 5.1.1
+In Klasse ArtikelModel
+private Artikel[] artikel = new Artikel[100];
+private ArrayList<Artikel> artikel = new ArrayList<>();
+private int anzahl Artikel;
+public int getAnzahlArtikel() {
+return anzahlArtikel;
+}
+public void setAnzahlArtikel(int anzahlArtikel) {
+this.anzahlArtikel = anzahlArtikel;
+}
+public void leseArtikelAusCsvDatei()
+ throws IOException{
+ReaderCreator readerCreator = new ConcreteCsvReaderCreator();
+ReaderProduct reader = readerCreator.factoryMethod();
+this.setAnzahlArtikel(reader.leseAnzahlArtikel());
+this.artikel = reader.leseArtikel();
+}
+public void schreibeArtikelInTxtDatei()
+ throws IOException{
+WriterCreator writerCreator = new ConcreteTxtWriterCreator();
+WriterProduct writer = writerCreator.factoryMethod();
+writer.schreibeArtikel(this.getAnzahlArtikel(), this.artikel);
+}
+public void schreibeArtikelInKonsole()
+throws IOException{
+WriterCreator writerCreator = new ConcreteKonsoleWriterCreator();
+WriterProduct writer = writerCreator.factoryMethod();
+writer.schreibeArtikel(this.getAnzahlArtikel(), this.artikel);
+}
+Klasse ReaderProduct
+public abstract class ReaderProduct {
+public abstract Artikel[] leseArtikel()
+throws IOException;
+public abstract ArrayList<Artikel> leseArtikel()
+throws IOException;
+}
+2
+In Klasse ConcreteCsvReaderProduct
+public int leseAnzahlArtikel() throws IOException {
+int anzahlArtikel = 0;
+BufferedReader ein = new BufferedReader(
+new FileReader("Artikel.csv"));
+anzahlArtikel = Integer.parseInt(ein.readLine());
+ein.close();
+return anzahlArtikel;
+}
+public Artikel[] leseArtikel() throws IOException {
+public ArrayList<Artikel> leseArtikel() throws IOException {
+ArrayList<Artikel> artikel = new ArrayList<>();
+BufferedReader ein = new BufferedReader(
+new FileReader("Artikel.csv"));
+String[] zeile = null;
+String zeileStr = ein.readLine();
+while(zeileStr != null) {
+zeile = zeileStr.split(";");
+artikel.add(new Artikel(
+Integer.parseInt(zeile[0]), zeile[1],
+Double.parseDouble(zeile[2])));
+zeileStr = ein.readLine();
+}
+ ein.close();
+return artikel;
+}
+Datei Artikel.csv
+In Klasse WriterProduct
+public abstract void schreibeArtikel(Artikel[] artikel
+ArrayList<Artikel> artikel)
+throws IOException;
+In Klasse ConcreteTxtWriterProduct
+public void schreibeArtikel(int anzahlArtikel, Artikel[] artikel)
+public void schreibeArtikel(ArrayList<Artikel> artikel)
+throws IOException{
+BufferedWriter aus
+= new BufferedWriter(new FileWriter("Artikel.txt"));
+aus.write(artikel.size() + "");
+aus.newLine();
+3
+for(int i = 0; i < anzahlArtikel; i++) {
+for(Artikel art : artikel){
+aus.write(artikel[i].getArtikelnummer());
+aus.write(art.getArtikelnummer() + "");
+aus.newLine();
+aus.write(artikel[i].getArtikelname());
+aus.write(art.getArtikelname());
+aus.newLine();
+aus.write(artikel[i].getBasispreis() + "");
+aus.write(art.getBasispreis() + "");
+aus.newLine();
+}
+aus.close();
+}
+In Klasse ConcreteKonsoleWriterProduct
+public void schreibeArtikel(int anzahlArtikel, Artikel[] artikel)
+public void schreibeArtikel(ArrayList<Artikel> artikel)
+throws IOException{
+System.out.println("Anzahl vorhandener Artikel: "
++ artikel.size() + "");
+System.out.println("");
+for(int i = 0; i < anzahlArtikel; i++) {
+for(Artikel art : artikel){
+System.out.println("Artikelnummer: "
++ artikel[i].getArtikelnummer());
+System.out.println("Artikelnummer: "
++ art.getArtikelnummer());
+System.out.println("Artikelname: "
++ artikel[i].getArtikelname());
+System.out.println("Artikelname: " + art.getArtikelname();
+System.out.println("Basispreis: "
++ artikel[i].getBasispreis());
+System.out.println("Basispreis: " + art.getBasispreis());
+System.out.println("");
+}
+}
+4
+Aufgabe 5.1.2
+In Klasse BaelleModel
+ private Ball[] baelle = new Ball[100];
+private SportartikelListe<Ball> baelle = new SportartikelListe<>();
+private int anzahlBaelle;
+public int getAnzahlBaelle() {
+return anzahlBaelle;
+}
+public void setAnzahlBaelle(int anzahlBaelle) {
+this.anzahlBaelle = anzahlBaelle;
+}
+public Ball[] holeBaelle() {
+Ball[] result = new Ball[this.getAnzahlBaelle()];
+for(int i = 0; i < result.length; i++) {
+result[i] = this.baelle[i];
+}
+return result;
+}
+public SportartikelListe<Ball> getBaelle(){
+return this.baelle;
+}
+public Ball gibBall(String einkaufsdatum) {
+Ball ball = null;
+int i = 0;
+while (ball == null && i < this.getAnzahlBaelle()) {
+while (ball == null && i < this.baelle.getAnzahlSportartikel ()) {
+if(Integer.parseInt(einkaufsdatum)
+== this.holeBaelle()[i].getEinkaufsdatum()){
+if(Integer.parseInt(einkaufsdatum)
+== this.baelle.getSportartikel(i)).getEinkaufsdatum()){
+ball = this.holeBaelle()[i];
+ball = this.baelle.getSportartikel(i);
+}
+i++;
+}
+return ball;
+}
+// Die Fabrik-Methode wurde zum Lesen aus der CsvDatei nicht angewendet
+public void leseBaelleAusDatei()
+ throws Exception{
+BufferedReader ein = new BufferedReader(
+new FileReader("Baelle.csv"));
+ this.anzahlBaelle = Integer.parseInt(ein.readLine());
+ int anzahlBaelle = Integer.parseInt(ein.readLine());
+ String[] zeile;
+this.baelle.removeAllSportartikel();
+5
+ // Das Ersetzen der for-Schleife durch eine foreach-Schleife ist
+// nicht sinnvoll, da die SportartikelListe<Ball> erst erstellt
+// werden muss.
+ for(int i = 0; i < this.getAnzahlBaelle(); i++) {
+ for(int i = 0; i < anzahlBaelle; i++) {
+ zeile = ein.readLine().split(";");
+ this.baelle[i] = new Ball(
+ this.baelle.addSportartikel(new Ball(
+ Integer.parseInt(zeile[0]),
+ zeile[1], zeile[2], zeile[3], zeile[4],
+ Double.parseDouble(zeile[5])));
+ }
+ ein.close();
+ notifyObservers();
+}
+In Klasse BaelleView
+ public void update(){
+ cmbBxEinkaufdatum.getItems().clear();
+for(int i = 0; i < baelleModel.getAnzahlBaelle(); i++) {
+// Ersetzen der for-Schleife durch eine foreach-Schleife ist nur
+// moeglich, wenn SportartikelListe eine Instanz von Iterable ist.
+for(int i = 0; i < baelleModel.getBaelle().getAnzahlSportartikel();
+i++) {
+cmbBxEinkaufdatum.getItems().add(
+baelleModel.holeBaelle[i].getEinkaufsdatum() + "");
+ baelleModel.getBaelle().getSportartikel(i)
+.getEinkaufsdatum() + "");
+}
+ }
+In Klasse SportartikelView
+public void update() {
+ String text = "";
+ // Ersetzen der for-Schleife durch eine foreach-Schleife ist nur
+// moeglich, wenn SportartikelListe eine Instanz von Iterable ist.
+ for(int i = 0; i < baelleModel.holeBaelle().length; i++) {
+ for(int i = 0; i < baelleModel.getBaelle().getAnzahlSportartikel();
+i++) {
+ text = text + baelleModel.holeBaelle()[i].gibZurueck('|')
++ "\n";
+ text = text
++ baelleModel.getBaelle().getSportartikel(i)
+.gibZurueck('|') + "\n";
+ }
+ txtAnzeigeBaelle.setText(text);
+ zeigeInformationsfensterAn("Beachten Sie die Anzeige!");
+ }
+6
+Zu dem Test:
+Die ersten beiden Anweisungen der Methode testSportartikelListe sind nicht kompilierbar,
+da die Klassen String und Integer nicht von der Klasse Sportartikel abgeleitet sind.
+Die Konsolenausgabe der verbleibenden Anweisungen ist die folgende:
+Die Ausgaben von listeSportartikel und listeBaelle sind identisch wegen dynamischer
+Bindung.
+7
+Aufgabe 5.2
+In Klasse BaelleView
+private void initListener() {
+ cmbBxEinkaufdatum.setOnAction(new EventHandler<ActionEvent>() {
+@Override
+public void handle(ActionEvent e) {
+zeigeBallAn();
+}
+ });
+ cmbBxEinkaufdatum.setOnAction(
+ e -> zeigeBallAn());
+ btnAenderungAufnehmen.setOnAction(new EventHandler<ActionEvent>() {
+ @Override
+ public void handle(ActionEvent e) {
+ zeigeInformationsfensterAn("Noch nicht implementiert!");
+ }
+ });
+ btnAenderungAufnehmen.setOnAction(
+ e -> zeigeInformationsfensterAn("Noch nicht implementiert!"));
+
+ mnItmCsvImport.setOnAction(new EventHandler<ActionEvent>() {
+ @Override
+ public void handle(ActionEvent e) {
+ baelleControl.leseBaelleAusDatei();
+ }
+ });
+ mnItmCsvImport.setOnAction(
+ e -> baelleControl.leseBaelleAusDatei());
+ }
+
+In Klasse SportartikelView
+private void initListener() {
+ stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+ @Override
+ public void handle(WindowEvent e) {
+ SportartikelView.this.baelleModel
+ .removeObserver(SportartikelView.this);
+ }
+ });
+
+ stage.setOnCloseRequest(
+ e -> SportartikelView.this.baelleModel
+.removeObserver(SportartikelView.this));
+ }

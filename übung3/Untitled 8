@@ -1,0 +1,152 @@
+Klasse BallTest
+package business.baelle;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
+class BallTest {
+private Ball ball;
+@BeforeEach
+void setUp() throws Exception {
+this.ball = new Ball(20140601, "Leder", null,
+"in Gebrauch", "Spiel", -59.99);
+}
+@AfterEach
+void tearDown() throws Exception {
+this.ball = null;
+}
+@Test
+void test() {
+// Testfall: Die vorgegebene Sportart ist null, mit
+// void assertTrue(boolean condition, String message)
+assertTrue(this.ball.ueberpruefeSportart() == false,
+"Das Ergebnis muss false ergeben");
+// Testfall: Die vorgegebene Sportart ist nicht null, mit
+// void assertTrue(boolean condition,
+// Supplier<String> messageSupplier)
+this.ball.setSportart("Fußball");
+assertTrue(this.ball.ueberpruefeSportart() == true,
+(() -> "Das Ergebnis muss true ergeben."));
+}
+}
+Klasse TrikotTest
+package ballsportverein.trikots;
+
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
+
+class TrikotTest {
+private Trikot trikot;
+
+2
+@AfterEach
+void tearDown() throws Exception {
+this.trikot = null;
+}
+@Test
+void testTrikot() {
+this.trikot = new Trikot(1, 42, 49.90, 20240701);
+// Trikotnummer groesser als 0
+assertTrue(() -> this.trikot.getTrikotnummer() == 1,
+"Die Trikotnummer wurde nicht richtig gesetzt.");
+// Groesse groesser als 0
+assertTrue(() -> this.trikot.getGroesse() == 42,
+() -> "Die Trikotnummer wurde nicht richtig gesetzt.");
+// Trikotnummer kleiner oder gleich 0
+Throwable exc = assertThrows(IllegalArgumentException.class,
+ () -> {new Trikot(-1, 40, 29.99, 20220919);});
+assertEquals("Die Trikotnummer darf nicht 0 oder negativ sein.",
+exc.getMessage());
+}
+}
+Im Konstruktor der Klasse Trikot
+public Trikot(int trikotnummer, …, int einkaufsdatum) {
+super();
+if(trikotnummer <= 0) {
+throw new IllegalArgumentException(
+"Die Trikotnummer darf nicht 0 oder negativ sein.");
+ // in Test a) falsche Meldung nehmen.
+}
+this.trikotnummer = trikotnummer;
+ …
+}
+3
+6.2 JUnit Test zur Anwendung zu Artikeln
+In der Klasse Artikel
+Die Java-Klasse Artikel, die vorgegeben wird (Fehler sind fett gedruckt):
+public double berechnePreisJeArtikel(int anzahlKaufArtikel)
+ throws IllegalArgumentException {
+double ergebnisProz = 100;
+int[] anzArtikel = new int[]{0, 500, 1000};
+int[] preisJeStueckProz = new int[]{100, 75, 60};
+ int pos = 1;
+// Der folgende Abschnitt fehlt
+ if(anzahlKaufArtikel <= 0){
+throw new IllegalArgumentException(
+"Anzahl muss groesser als 0 sein.");
+}
+else if(anzahlKaufArtikel >= 1000){
+ergebnisProz = 60;
+}
+else{
+while(anzArtikel[pos] < anzahlKaufArtikel) {
+pos++;
+}
+ergebnisProz =
+((preisJeStueckProz[pos]
+// 2 * ist falsch
+ // * (1.0 ist notwendig, um ganzzahlige
+ // Division zu vermeiden.
+– 2 * preisJeStueckProz[pos-1]) * 1.0
+ / (anzArtikel[pos] - anzArtikel[pos-1]))
+* (anzahlKaufArtikel - anzArtikel[pos-1])
++ preisJeStueckProz[pos-1];
+}
+}
+ return (ergebnisProz / 100) * this.basispreis;
+}
+Klasse ArtikelTest
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+4
+class ArtikelTest {
+private Artikel artikel;
+@BeforeEach
+void setUp() throws Exception {
+this.artikel
+= new Artikel(110, "Parkett Eiche geräuchert", 69.9);
+}
+@AfterEach
+void tearDown() throws Exception {
+this.artikel = null;
+}
+@Test
+void test() {
+double erg;
+// Testfall: anzahlKaufArtikel < 0
+try {
+this.artikel.berechnePreisJeArtikel(-1);
+fail("Exception: 'Anzahl darf nicht negativ sein' fehlt.");
+}
+catch(Exception exc){
+}
+// Testfall: anzahlKaufArtikel = 0
+try {
+this.artikel.berechnePreisJeArtikel(0);
+fail("Exception: 'Anzahl darf nicht 0 sein' fehlt.");
+}
+catch(Exception exc){
+}
+// Testfall: anzahlKaufArtikel ist 500 oder 1000
+erg = this.artikel.berechnePreisJeArtikel(500);
+assertEquals(52.425, erg, 0.001);
+erg = this.artikel.berechnePreisJeArtikel(1000);
+assertEquals(41.94, erg, 0.001);
+// Testfall: anzahlKaufArtikel zwischen x-Werten zweier Punkte
+erg = this.artikel.berechnePreisJeArtikel(600);
+assertEquals(50.328, erg, 0.001);
+// Testfall: anzahlKaufArtikel ist groesser als 1000
+erg = this.artikel.berechnePreisJeArtikel(1001);
+assertEquals(41.94, erg, 0.001);
+}
+}
